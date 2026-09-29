@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OC Forge — Character & World Builder</title>
+<style>
+:root{
+ --bg:#0b0b10;--panel:#12121a;--panel2:#181822;--line:#292936;--text:#eeeef5;--muted:#9494a7;
+ --accent:#b58cff;--accent2:#7c5cff;--danger:#ff6b81;--good:#67e8b2;--shadow:0 18px 50px #0008;
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 80% -10%,#35205c55,transparent 35%),var(--bg);color:var(--text);font:14px Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}.sidebar{width:250px;background:#0e0e15ee;border-right:1px solid var(--line);padding:20px 14px;position:fixed;inset:0 auto 0 0;z-index:10}
+.brand{font-size:21px;font-weight:800;padding:8px 10px 24px;letter-spacing:-.5px}.brand span{color:var(--accent)}
+.project{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px;margin:0 2px 18px}.project small{color:var(--muted);display:block}.project b{display:block;margin-top:4px}
+.nav{display:grid;gap:4px}.navSection{margin:12px 8px 5px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.ocList{display:grid;gap:10px}.ocItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;background:#0e0e15;border:1px solid var(--line);border-radius:11px;cursor:pointer;transition:.18s}.ocItem:hover{border-color:var(--accent);background:#14121d;transform:translateY(-1px)}.ocInfo{display:flex;align-items:center;gap:12px;min-width:0}.ocAvatar{width:44px;height:44px;border-radius:10px;background:#20202b;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}.ocAvatar img{width:100%;height:100%;object-fit:cover}.ocName{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ocMeta{font-size:12px;color:var(--muted);margin-top:3px}.ocActions{display:flex;gap:6px;flex-wrap:wrap}.currentBadge{font-size:10px;color:var(--accent);border:1px solid #493d63;border-radius:99px;padding:3px 7px}.nav button{background:transparent;border:0;color:var(--muted);text-align:left;padding:10px 12px;border-radius:9px;display:flex;gap:10px;align-items:center}.nav button:hover,.nav button.active{background:#201b2e;color:#fff}.nav button.active{box-shadow:inset 3px 0 var(--accent)}
+.main{margin-left:250px;width:calc(100% - 250px);padding:28px;max-width:1500px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.topbar h1{margin:0;font-size:27px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 13px;border-radius:9px}.btn:hover{border-color:#555568}.btn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent));border:0;color:white}.btn.danger{color:#ff9aaa}.btn.small{padding:6px 9px;font-size:12px}
+.page{display:none}.page.active{display:block}.grid{display:grid;gap:15px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,#15151f,#111119);border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:0 8px 30px #0002}.card h2,.card h3{margin:0 0 13px}.muted{color:var(--muted)}.stat{font-size:25px;font-weight:800}.statlabel{font-size:12px;color:var(--muted);margin-top:4px}
+label{display:block;color:#c5c5d1;font-size:12px;margin:0 0 6px}input,textarea,select{width:100%;background:#0d0d14;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px;outline:none}input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{min-height:100px;resize:vertical}.field{margin-bottom:12px}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}
+.avatar{width:150px;height:150px;border-radius:18px;background:#20202b;border:1px dashed #4a4a5c;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:45px;color:#777}.avatar img{width:100%;height:100%;object-fit:cover}.profilehead{display:flex;gap:20px;align-items:center;margin-bottom:20px}.profilehead h2{font-size:27px;margin:0 0 5px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{padding:5px 8px;background:#211d30;border:1px solid #393049;color:#cdbbff;border-radius:99px;font-size:12px}
+.list{display:grid;gap:9px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;background:#0e0e15;border:1px solid var(--line);border-radius:9px}.empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.range{display:flex;align-items:center;gap:10px}.range input{padding:0;border:0}.range output{width:38px;text-align:right;color:var(--accent)}
+.bar{height:8px;background:#272733;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:inherit}
+.avatarGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}.photo{aspect-ratio:1;background:#181821;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative}.photo img{width:100%;height:100%;object-fit:cover}.photo .del{position:absolute;right:6px;top:6px}
+.timeline{border-left:2px solid #332a48;margin:10px 0;padding-left:22px}.event{position:relative;margin-bottom:18px}.event:before{content:"";position:absolute;left:-29px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px #181324}.event b{color:#d8caff}.event p{margin:5px 0;color:var(--muted)}
+.relationships{position:relative;min-height:300px;background:#0c0c12;border:1px solid var(--line);border-radius:13px;overflow:auto}.node{position:absolute;width:130px;padding:10px;text-align:center;background:#201c2b;border:1px solid #493d63;border-radius:12px}.node strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.node small{color:var(--muted)}
+.toast{position:fixed;right:22px;bottom:22px;background:#22202d;border:1px solid #4c4161;padding:11px 15px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;z-index:99}.toast.show{opacity:1;transform:none}
+.modal{display:none;position:fixed;inset:0;background:#0009;z-index:50;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;background:#14141d;border:1px solid var(--line);border-radius:17px;padding:20px}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+@media(max-width:900px){.sidebar{width:70px;padding:15px 8px}.brand{font-size:0;text-align:center}.brand:after{content:"✦";font-size:22px}.project,.nav span{display:none}.nav button{justify-content:center}.main{margin-left:70px;width:calc(100% - 70px);padding:18px}.g2,.g3,.g4,.formgrid{grid-template-columns:1fr}.profilehead{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand">OC <span>FORGE</span></div>
+ <div class="project"><small data-i18n="currentProject">Current project</small><b id="projectName">My Universe</b></div>
+ <nav class="nav">
+  <button class="active" data-page="ocList">☷ <span data-i18n="ocList">OC List</span></button>
+  <div class="navSection" data-i18n="currentOCSection">Current OC</div>
+  <div id="ocNav">
+  <button data-page="dashboard">◈ <span data-i18n="dashboard">Dashboard</span></button>
+  <button data-page="profile">♙ <span data-i18n="profile">Profile</span></button>
+  <button data-page="appearance">✦ <span data-i18n="appearance">Appearance</span></button>
+  <button data-page="personality">◉ <span data-i18n="personality">Personality</span></button>
+  <button data-page="background">▤ <span data-i18n="background">Background</span></button>
+  <button data-page="relationships">⌘ <span data-i18n="relationships">Relationships</span></button>
+  <button data-page="world">◎ <span data-i18n="world">World Building</span></button>
+  <button data-page="timeline">◷ <span data-i18n="timeline">Timeline</span></button>
+  <button data-page="story">▱ <span data-i18n="story">Story / Plot</span></button>
+  <button data-page="gallery">▧ <span data-i18n="gallery">Gallery</span></button>
+  <button data-page="notes">✎ <span data-i18n="notes">Notes</span></button>
+  <button data-page="settings">⚙ <span data-i18n="settings">Settings</span></button>
+  </div>
+ </nav>
+</aside>
+
+<main class="main">
+<div class="topbar"><h1 id="pageTitle">Dashboard</h1><div class="actions">
+ <select id="languageSelect" class="btn" onchange="setLanguage(this.value)" style="width:auto;padding:9px 12px">
+  <option value="en">🇬🇧 English</option>
+  <option value="vi">🇻🇳 Tiếng Việt</option>
+ </select>
+ <button class="btn" data-i18n="saveOC" onclick="saveCurrentOC()">✓ Save OC</button><button class="btn primary" data-i18n="newOC" onclick="newOC()">＋ New OC</button>
+</div></div>
+
+<section id="ocList" class="page active">
+ <div class="card"><div class="actions" style="justify-content:space-between;align-items:center;margin-bottom:14px"><div><h2 data-i18n="myOCs" style="margin-bottom:4px">My OCs</h2><div class="muted" data-i18n="ocListHint">Each OC is saved separately in this browser.</div></div><button class="btn primary" data-i18n="newOC" onclick="newOC()">＋ New OC</button></div><div id="ocListGrid" class="ocList"></div></div>
+</section>
+
+<section id="dashboard" class="page active">
+ <div class="grid g4" id="stats"></div><br>
+ <div class="grid g2">
+  <div class="card"><h2 id="dashCharacterTitle"></h2><div id="dashCharacter"></div></div>
+  <div class="card"><h2 id="dashNotesTitle"></h2><div id="dashNotes"></div></div>
+ </div><br>
+ <div class="card"><h2 data-i18n="ocChecklist">OC Checklist</h2><div id="checklist"></div></div>
+</section>
+
+<section id="profile" class="page">
+ <div class="card">
+  <div class="profilehead"><div class="avatar" id="avatarPreview">♙</div><div><h2 id="profileName">Unnamed OC</h2><div class="muted" id="profileSubtitle">Create your character identity</div><br><div class="tags" id="profileTags"></div></div></div>
+  <div class="formgrid">
+   <div class="field"><label data-i18n="characterName">Character name</label><input id="name" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="alias">Nickname / Alias</label><input id="alias" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="age">Age</label><input id="age" type="number" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="birthday">Birthday</label><input id="birthday" type="date" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="gender">Gender</label>
+<select id="gender" onchange="saveRender()">
+ <option value="" data-i18n="selectGender">Select gender</option>
+ <option value="Male" data-i18n="male">Male</option>
+ <option value="Female" data-i18n="female">Female</option>
+ <option value="Non-binary" data-i18n="nonbinary">Non-binary</option>
+ <option value="Agender" data-i18n="agender">Agender</option>
+ <option value="Genderfluid" data-i18n="genderfluid">Genderfluid</option>
+ <option value="Other" data-i18n="other">Other</option>
+ <option value="Prefer not to say" data-i18n="preferNot">Prefer not to say</option>
+</select></div>
+   <div class="field"><label data-i18n="pronouns">Pronouns</label><input id="pronouns" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="species">Species / Race</label><input id="species" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="occupation">Occupation</label><input id="occupation" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="origin">Nationality / Origin</label><input id="origin" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="archetype">Alignment / Archetype</label><input id="archetype" oninput="saveRender()"></div>
+   <div class="field full"><label data-i18n="bio">Short description</label><textarea id="bio" oninput="saveRender()"></textarea></div>
+   <div class="field full"><label data-i18n="avatar">Avatar image</label><input type="file" accept="image/*" onchange="setAvatar(event)"></div>
+  </div>
+ </div>
+</section>
+
+<section id="appearance" class="page">
+ <div class="grid g2">
+  <div class="card"><h2 data-i18n="physicalTraits">Physical traits</h2><div class="formgrid">
+   <div class="field"><label data-i18n="height">Height</label><input id="height" oninput="saveRender()"></div><div class="field"><label data-i18n="weight">Weight</label><input id="weight" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="hair">Hair</label><input id="hair" oninput="saveRender()"></div><div class="field"><label data-i18n="eyes">Eyes</label><input id="eyes" oninput="saveRender()"></div>
+   <div class="field"><label data-i18n="skin">Skin / complexion</label><input id="skin" oninput="saveRender()"></div><div class="field"><label data-i18n="body">Body type</label><input id="body" oninput="saveRender()"></div>
+   <div class="field full"><label data-i18n="features">Distinctive features</label><textarea id="features" oninput="saveRender()"></textarea></div>
+  </div></div>
+  <div class="card"><h2 data-i18n="style">Style</h2><div class="field"><label data-i18n="everydayStyle">Everyday style</label><textarea id="style" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="palette">Color palette</label><input id="palette" data-i18n-placeholder="palettePlaceholder" placeholder="black, silver, violet..." oninput="saveRender()"></div><div class="field"><label data-i18n="signature">Signature item</label><input id="signature" oninput="saveRender()"></div><div class="field"><label data-i18n="visualRefs">Visual references</label><textarea id="visualNotes" oninput="saveRender()"></textarea></div></div>
+ </div>
+</section>
+
+<section id="personality" class="page">
+ <div class="grid g2">
+  <div class="card"><h2 data-i18n="personalityTitle">Personality</h2><div class="field"><label data-i18n="mbti">MBTI</label><input id="mbti" oninput="saveRender()"></div><div class="field"><label data-i18n="enneagram">Enneagram</label><input id="enneagram" oninput="saveRender()"></div><div class="field"><label data-i18n="corePersonality">Core personality</label><textarea id="personalityText" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="likes">Likes</label><textarea id="likes" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="dislikes">Dislikes</label><textarea id="dislikes" oninput="saveRender()"></textarea></div></div>
+  <div class="card"><h2 data-i18n="traits">Traits</h2><div id="traitSliders"></div><hr><div class="field"><label data-i18n="strengths">Strengths</label><textarea id="strengths" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="weaknesses">Weaknesses</label><textarea id="weaknesses" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="habits">Habits / quirks</label><textarea id="habits" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="fears">Fears</label><textarea id="fears" oninput="saveRender()"></textarea></div></div>
+ </div>
+</section>
+
+<section id="background" class="page">
+ <div class="grid g2">
+  <div class="card"><h2 data-i18n="lifeHistory">Life history</h2><div class="field"><label data-i18n="birthplace">Birthplace</label><input id="birthplace" oninput="saveRender()"></div><div class="field"><label data-i18n="family">Family</label><textarea id="family" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="childhood">Childhood</label><textarea id="childhood" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="education">Education</label><textarea id="education" oninput="saveRender()"></textarea></div></div>
+  <div class="card"><h2 data-i18n="motivation">Motivation</h2><div class="field"><label data-i18n="desire">Greatest desire</label><textarea id="desire" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="regret">Biggest regret</label><textarea id="regret" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="secret">Secret</label><textarea id="secret" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="arc">Character arc</label><textarea id="arc" oninput="saveRender()"></textarea></div></div>
+ </div>
+</section>
+
+<section id="relationships" class="page">
+ <div class="actions" style="margin-bottom:12px"><button class="btn primary" onclick="addRelationship()"><span data-i18n="addRelationship">＋ Add relationship</span></button></div>
+ <div class="grid g2"><div class="card"><h2 data-i18n="relationshipList">Relationship list</h2><div id="relList"></div></div><div class="card"><h2 data-i18n="relationshipMap">Relationship map</h2><div class="relationships" id="relMap"></div></div></div>
+</section>
+
+<section id="world" class="page">
+ <div class="grid g2">
+  <div class="card"><h2 data-i18n="worldIdentity">World identity</h2><div class="field"><label data-i18n="worldName">World name</label><input id="worldName" oninput="saveRender()"></div><div class="field"><label data-i18n="worldGenre">Genre / era</label><input id="worldGenre" oninput="saveRender()"></div><div class="field"><label data-i18n="worldConcept">Core concept</label><textarea id="worldConcept" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="worldRules">Rules / magic / technology</label><textarea id="worldRules" oninput="saveRender()"></textarea></div></div>
+  <div class="card"><h2 data-i18n="worldElements">World elements</h2><div class="field"><label data-i18n="locations">Countries / cities</label><textarea id="locations" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="factions">Factions / organizations</label><textarea id="factions" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="cultures">Races / cultures</label><textarea id="cultures" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="beliefs">Religion / beliefs</label><textarea id="beliefs" oninput="saveRender()"></textarea></div></div>
+ </div>
+</section>
+
+<section id="timeline" class="page">
+ <div class="actions" style="margin-bottom:12px"><button class="btn primary" onclick="addTimeline()"><span data-i18n="addEvent">＋ Add event</span></button></div>
+ <div class="card"><div id="timelineList" class="timeline"></div></div>
+</section>
+
+<section id="story" class="page">
+ <div class="grid g2">
+  <div class="card"><h2 data-i18n="storyFoundation">Story foundation</h2><div class="field"><label data-i18n="premise">Premise</label><textarea id="premise" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="conflict">Main conflict</label><textarea id="conflict" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="theme">Theme</label><input id="theme" oninput="saveRender()"></div><div class="field"><label data-i18n="ending">Ending / destination</label><textarea id="ending" oninput="saveRender()"></textarea></div></div>
+  <div class="card"><h2 data-i18n="plotBeats">Plot beats</h2><div class="field"><label data-i18n="act1">Act I</label><textarea id="act1" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="act2">Act II</label><textarea id="act2" oninput="saveRender()"></textarea></div><div class="field"><label data-i18n="act3">Act III</label><textarea id="act3" oninput="saveRender()"></textarea></div></div>
+ </div>
+</section>
+
+<section id="gallery" class="page">
+ <div class="card"><h2 data-i18n="referenceGallery">Reference gallery</h2><p class="muted" data-i18n="galleryHint">Images are stored locally in this browser.</p><input type="file" accept="image/*" multiple onchange="addGallery(event)"><br><br><div id="galleryGrid" class="avatarGrid"></div></div>
+</section>
+
+<section id="notes" class="page">
+ <div class="card"><h2 data-i18n="freeNotes">Free notes</h2><textarea id="notesText" style="min-height:60vh" placeholder="Ideas, dialogue, scenes, random details..." oninput="saveRender()"></textarea></div>
+</section>
+
+<section id="settings" class="page">
+ <div class="card"><h2 data-i18n="projectSettings">Project settings</h2><div class="field"><label data-i18n="projectNameLabel">Project name</label><input id="projectInput" oninput="data.projectName=this.value;saveCurrentData();document.getElementById('projectName').textContent=this.value"></div><p class="muted" data-i18n="saveHint">Your OC is automatically saved in this browser. Use “Save OC” to save immediately. “New OC” saves the current OC before creating a blank one.</p><hr><button class="btn danger" data-i18n="reset" onclick="resetData()">Reset all data</button></div>
+</section>
+</main></div>
+<div id="toast" class="toast"></div>
+
+<div class="modal" id="relModal"><div class="modalbox"><h2 data-i18n="addRelationshipTitle">Add relationship</h2>
+ <div class="formgrid"><div class="field"><label data-i18n="otherCharacter">Other character</label><input id="relName"></div><div class="field"><label data-i18n="relationshipType">Relationship type</label><input id="relType" data-i18n-placeholder="friendPlaceholder" placeholder="friend, rival, lover..."></div><div class="field full"><label data-i18n="description">Description</label><textarea id="relDesc"></textarea></div></div>
+ <div class="actions"><button class="btn" data-i18n="cancel" onclick="closeModal()">Cancel</button><button class="btn primary" data-i18n="save" onclick="saveRelationship()">Save</button></div>
+</div></div>
+
+<div class="modal" id="eventModal"><div class="modalbox"><h2 data-i18n="addEventTitle">Add timeline event</h2>
+ <div class="field"><label data-i18n="dateAge">Date / age</label><input id="eventDate"></div><div class="field"><label data-i18n="eventTitle">Event title</label><input id="eventTitle"></div><div class="field"><label data-i18n="description">Description</label><textarea id="eventDesc"></textarea></div>
+ <div class="actions"><button class="btn" data-i18n="cancel" onclick="closeModal()">Cancel</button><button class="btn primary" data-i18n="save" onclick="saveTimeline()">Save</button></div>
+</div></div>
+
+<script>
+const KEY="ocforge_v1";
+const OC_KEY="ocforge_multi_v1";
+const fields=[
+"name","alias","age","birthday","gender","pronouns","species","occupation","origin","archetype","bio",
+"height","weight","hair","eyes","skin","body","features","style","palette","signature","visualNotes",
+"mbti","enneagram","personalityText","likes","dislikes","strengths","weaknesses","habits","fears",
+"birthplace","family","childhood","education","desire","regret","secret","arc",
+"worldName","worldGenre","worldConcept","worldRules","locations","factions","cultures","beliefs",
+"premise","conflict","theme","ending","act1","act2","act3","notesText"
+];
+const traits=["Warmth","Confidence","Patience","Humor","Curiosity","Discipline","Empathy","Impulsiveness"];
+function blankOC(name="Unnamed OC"){return {id:"oc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),projectName:name,relations:[],timeline:[],gallery:[],traits:Object.fromEntries(traits.map(x=>[x,50])),avatar:""};}
+function normalizeOC(o){let n={...blankOC("Unnamed OC"),...(o||{})};n.relations=Array.isArray(n.relations)?n.relations:[];n.timeline=Array.isArray(n.timeline)?n.timeline:[];n.gallery=Array.isArray(n.gallery)?n.gallery:[];n.traits={...Object.fromEntries(traits.map(x=>[x,50])),...(n.traits||{})};return n;}
+function loadStore(){try{let x=JSON.parse(localStorage.getItem(OC_KEY));if(x&&Array.isArray(x.ocs))return x}catch(e){};try{let old=JSON.parse(localStorage.getItem(KEY));if(old){let migrated=normalizeOC(old);localStorage.setItem(OC_KEY,JSON.stringify({currentId:migrated.id,ocs:[migrated]}));return {currentId:migrated.id,ocs:[migrated]}}}catch(e){};let first=blankOC("My First OC");return {currentId:first.id,ocs:[first]};}
+let store=loadStore();
+let data=normalizeOC(store.ocs.find(o=>o.id===store.currentId)||store.ocs[0]);
+store.currentId=data.id;
+function persistStore(){let i=store.ocs.findIndex(o=>o.id===data.id);if(i<0)store.ocs.push(data);else store.ocs[i]=data;store.currentId=data.id;localStorage.setItem(OC_KEY,JSON.stringify(store));}
+function save(){persistStore()}
+function saveCurrentData(){persistStore()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function toast(msg){let e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}
+
+const translations={
+ en:{
+  ocList:"OC List",currentOCSection:"Current OC",dashboard:"Dashboard",profile:"Profile",appearance:"Appearance",personality:"Personality",background:"Background",relationships:"Relationships",world:"World Building",timeline:"Timeline",story:"Story / Plot",gallery:"Gallery",notes:"Notes",settings:"Settings",currentProject:"Current project",saveOC:"✓ Save OC",newOC:"＋ New OC",myOCs:"My OCs",ocListHint:"Each OC is saved separately in this browser.",character:"Character",fieldsCompleted:"Fields completed",relationshipCount:"Relationships",timelineEvents:"Timeline events",quickNotes:"Quick Notes",ocChecklist:"OC Checklist",characterBio:"Your character bio will appear here.",noNotes:"No notes yet.",identity:"Identity",appearanceCheck:"Appearance",personalityCheck:"Personality",backgroundCheck:"Background",worldCheck:"World",storyCheck:"Story",unnamed:"Unnamed OC",createIdentity:"Create your character identity",characterName:"Character name",alias:"Nickname / Alias",age:"Age",birthday:"Birthday",gender:"Gender",pronouns:"Pronouns",species:"Species / Race",occupation:"Occupation",origin:"Nationality / Origin",archetype:"Alignment / Archetype",bio:"Short description",avatar:"Avatar image",physicalTraits:"Physical traits",height:"Height",weight:"Weight",hair:"Hair",eyes:"Eyes",skin:"Skin / complexion",body:"Body type",features:"Distinctive features",style:"Style",everydayStyle:"Everyday style",palette:"Color palette",palettePlaceholder:"black, silver, violet...",signature:"Signature item",visualRefs:"Visual references",personalityTitle:"Personality",mbti:"MBTI",enneagram:"Enneagram",corePersonality:"Core personality",likes:"Likes",dislikes:"Dislikes",traits:"Traits",strengths:"Strengths",weaknesses:"Weaknesses",habits:"Habits / quirks",fears:"Fears",lifeHistory:"Life history",birthplace:"Birthplace",family:"Family",childhood:"Childhood",education:"Education",motivation:"Motivation",desire:"Greatest desire",regret:"Biggest regret",secret:"Secret",arc:"Character arc",addRelationship:"＋ Add relationship",relationshipList:"Relationship list",relationshipMap:"Relationship map",noRelationships:"No relationships yet.",worldIdentity:"World identity",worldName:"World name",worldGenre:"Genre / era",worldConcept:"Core concept",worldRules:"Rules / magic / technology",worldElements:"World elements",locations:"Countries / cities",factions:"Factions / organizations",cultures:"Races / cultures",beliefs:"Religion / beliefs",addEvent:"＋ Add event",noEvents:"No events yet. Build your character's history.",storyFoundation:"Story foundation",premise:"Premise",conflict:"Main conflict",theme:"Theme",ending:"Ending / destination",plotBeats:"Plot beats",act1:"Act I",act2:"Act II",act3:"Act III",referenceGallery:"Reference gallery",galleryHint:"Images are stored locally in this browser.",noImages:"No reference images.",freeNotes:"Free notes",notesPlaceholder:"Ideas, dialogue, scenes, random details...",projectSettings:"Project settings",projectNameLabel:"Project name",saveHint:"Each OC is saved separately in this browser. Switching OCs will not delete the others.",reset:"Delete all OC data",addRelationshipTitle:"Add relationship",otherCharacter:"Other character",relationshipType:"Relationship type",friendPlaceholder:"friend, rival, lover...",description:"Description",cancel:"Cancel",save:"Save",addEventTitle:"Add timeline event",dateAge:"Date / age",eventTitle:"Event title",delete:"Delete",selectGender:"Select gender",male:"Male",female:"Female",nonbinary:"Non-binary",agender:"Agender",genderfluid:"Genderfluid",other:"Other",preferNot:"Prefer not to say",avatarSaved:"Avatar saved",relationshipAdded:"Relationship added",eventAdded:"Event added",saved:"OC saved",mainOC:"Main OC",you:"YOU",deleteOC:"Delete",openOC:"Open",current:"Current",newOCName:"New OC",newOCConfirm:"Create a new OC? Your current OC will remain saved and can be opened from OC List.",deleteOCConfirm:"Delete this OC permanently? This cannot be undone.",resetConfirm:"Delete all OC Forge data from this browser?",noOCs:"No OCs yet.",defaultOCName:"My First OC",identityLabel:"Identity",appearanceLabel:"Appearance",backgroundLabel:"Background",worldLabel:"World",storyLabel:"Story",relationshipTypeLabel:"Type",traitWarmth:"Warmth",traitConfidence:"Confidence",traitPatience:"Patience",traitHumor:"Humor",traitCuriosity:"Curiosity",traitDiscipline:"Discipline",traitEmpathy:"Empathy",traitImpulsiveness:"Impulsiveness"
+ },
+ vi:{
+  ocList:"Danh sách OC",currentOCSection:"OC hiện tại",dashboard:"Tổng quan",profile:"Hồ sơ",appearance:"Ngoại hình",personality:"Tính cách",background:"Tiểu sử",relationships:"Mối quan hệ",world:"Xây dựng thế giới",timeline:"Dòng thời gian",story:"Cốt truyện",gallery:"Thư viện ảnh",notes:"Ghi chú",settings:"Cài đặt",currentProject:"Dự án hiện tại",saveOC:"✓ Lưu OC",newOC:"＋ OC mới",myOCs:"Danh sách OC",ocListHint:"Mỗi OC được lưu riêng trong trình duyệt này.",character:"Nhân vật",fieldsCompleted:"Trường đã điền",relationshipCount:"Mối quan hệ",timelineEvents:"Sự kiện dòng thời gian",quickNotes:"Ghi chú nhanh",ocChecklist:"Tiến độ OC",characterBio:"Mô tả nhân vật sẽ xuất hiện ở đây.",noNotes:"Chưa có ghi chú.",identity:"Thông tin cơ bản",appearanceCheck:"Ngoại hình",personalityCheck:"Tính cách",backgroundCheck:"Tiểu sử",worldCheck:"Thế giới",storyCheck:"Cốt truyện",unnamed:"OC chưa đặt tên",createIdentity:"Tạo thông tin nhân vật",characterName:"Tên nhân vật",alias:"Tên gọi / Bí danh",age:"Tuổi",birthday:"Ngày sinh",gender:"Giới tính",pronouns:"Đại từ xưng hô",species:"Chủng tộc / Loài",occupation:"Nghề nghiệp",origin:"Quốc tịch / Xuất thân",archetype:"Archetype / Khuynh hướng",bio:"Mô tả ngắn",avatar:"Ảnh đại diện",physicalTraits:"Đặc điểm cơ thể",height:"Chiều cao",weight:"Cân nặng",hair:"Tóc",eyes:"Mắt",skin:"Da / Nước da",body:"Dáng người",features:"Đặc điểm nhận dạng",style:"Phong cách",everydayStyle:"Phong cách thường ngày",palette:"Bảng màu",palettePlaceholder:"đen, bạc, tím...",signature:"Vật phẩm đặc trưng",visualRefs:"Ghi chú hình ảnh",personalityTitle:"Tính cách",mbti:"MBTI",enneagram:"Enneagram",corePersonality:"Tính cách cốt lõi",likes:"Sở thích",dislikes:"Không thích",traits:"Đặc điểm",strengths:"Điểm mạnh",weaknesses:"Điểm yếu",habits:"Thói quen / Tật nhỏ",fears:"Nỗi sợ",lifeHistory:"Lịch sử cuộc đời",birthplace:"Nơi sinh",family:"Gia đình",childhood:"Tuổi thơ",education:"Học vấn",motivation:"Động lực",desire:"Mong muốn lớn nhất",regret:"Điều hối tiếc nhất",secret:"Bí mật",arc:"Hành trình phát triển",addRelationship:"＋ Thêm mối quan hệ",relationshipList:"Danh sách mối quan hệ",relationshipMap:"Sơ đồ mối quan hệ",noRelationships:"Chưa có mối quan hệ nào.",worldIdentity:"Thông tin thế giới",worldName:"Tên thế giới",worldGenre:"Thể loại / Thời đại",worldConcept:"Khái niệm cốt lõi",worldRules:"Quy luật / Ma thuật / Công nghệ",worldElements:"Các yếu tố thế giới",locations:"Quốc gia / Thành phố",factions:"Phe phái / Tổ chức",cultures:"Chủng tộc / Văn hóa",beliefs:"Tôn giáo / Niềm tin",addEvent:"＋ Thêm sự kiện",noEvents:"Chưa có sự kiện. Hãy xây dựng lịch sử nhân vật.",storyFoundation:"Nền tảng câu chuyện",premise:"Tiền đề",conflict:"Xung đột chính",theme:"Chủ đề",ending:"Kết thúc / Đích đến",plotBeats:"Các hồi truyện",act1:"Hồi I",act2:"Hồi II",act3:"Hồi III",referenceGallery:"Thư viện ảnh tham khảo",galleryHint:"Ảnh được lưu cục bộ trong trình duyệt này.",noImages:"Chưa có ảnh tham khảo.",freeNotes:"Ghi chú tự do",notesPlaceholder:"Ý tưởng, hội thoại, cảnh truyện, chi tiết ngẫu nhiên...",projectSettings:"Cài đặt dự án",projectNameLabel:"Tên OC",saveHint:"Mỗi OC được lưu riêng trong trình duyệt này. Chuyển OC sẽ không xóa các OC khác.",reset:"Xóa toàn bộ dữ liệu OC",addRelationshipTitle:"Thêm mối quan hệ",otherCharacter:"Nhân vật khác",relationshipType:"Loại quan hệ",friendPlaceholder:"bạn, đối thủ, người yêu...",description:"Mô tả",cancel:"Hủy",save:"Lưu",addEventTitle:"Thêm sự kiện dòng thời gian",dateAge:"Ngày / Độ tuổi",eventTitle:"Tên sự kiện",delete:"Xóa",selectGender:"Chọn giới tính",male:"Nam",female:"Nữ",nonbinary:"Phi nhị nguyên",agender:"Không giới",genderfluid:"Linh hoạt giới",other:"Khác",preferNot:"Không muốn tiết lộ",avatarSaved:"Đã lưu ảnh đại diện",relationshipAdded:"Đã thêm mối quan hệ",eventAdded:"Đã thêm sự kiện",saved:"Đã lưu OC",mainOC:"OC chính",you:"BẠN",deleteOC:"Xóa",openOC:"Mở",current:"Đang mở",newOCName:"OC mới",newOCConfirm:"Tạo OC mới? OC hiện tại vẫn được lưu và có thể mở lại từ Danh sách OC.",deleteOCConfirm:"Xóa OC này vĩnh viễn? Không thể hoàn tác.",resetConfirm:"Xóa toàn bộ dữ liệu OC Forge trên trình duyệt này?",noOCs:"Chưa có OC nào.",defaultOCName:"OC đầu tiên",identityLabel:"Thông tin cơ bản",appearanceLabel:"Ngoại hình",backgroundLabel:"Tiểu sử",worldLabel:"Thế giới",storyLabel:"Cốt truyện",relationshipTypeLabel:"Loại quan hệ",traitWarmth:"Ấm áp",traitConfidence:"Tự tin",traitPatience:"Kiên nhẫn",traitHumor:"Hài hước",traitCuriosity:"Tò mò",traitDiscipline:"Kỷ luật",traitEmpathy:"Đồng cảm",traitImpulsiveness:"Bốc đồng"
+ }
+};
+let currentLang=localStorage.getItem("ocforge_lang")||"en";
+function t(key){return (translations[currentLang]&&translations[currentLang][key])||translations.en[key]||key;}
+function setLanguage(lang){currentLang=lang;localStorage.setItem("ocforge_lang",lang);applyLanguage();renderAll();}
+function applyLanguage(){document.documentElement.lang=currentLang;let select=document.getElementById("languageSelect");if(select)select.value=currentLang;document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n)});document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));let note=document.getElementById("notesText");if(note)note.placeholder=t("notesPlaceholder");document.title=currentLang==="vi"?"OC Forge — Xây dựng nhân vật & thế giới":"OC Forge — Character & World Builder";}
+function hydrate(){fields.forEach(id=>{let e=document.getElementById(id);if(e)e.value=data[id]??""});document.getElementById("projectName").textContent=data.projectName||t("unnamed");let pi=document.getElementById("projectInput");if(pi)pi.value=data.projectName||"";renderTraits();renderRelations();renderTimeline();renderGallery();renderProfile();renderDashboard();renderOCList();applyLanguage();}
+function saveRender(){fields.forEach(id=>{let e=document.getElementById(id);if(e)data[id]=e.value});save();renderProfile();renderDashboard();renderOCList();}
+function renderAll(){hydrate();}
+function renderProfile(){document.getElementById("profileName").textContent=data.name||t("unnamed");document.getElementById("profileSubtitle").textContent=[data.age&&data.age+(currentLang==="vi"?" tuổi":" years"),data.gender,data.occupation].filter(Boolean).join(" · ")||t("createIdentity");document.getElementById("profileTags").innerHTML=[data.species,data.archetype,data.origin].filter(Boolean).map(x=>`<span class="tag">${esc(x)}</span>`).join("");let a=document.getElementById("avatarPreview");a.innerHTML=data.avatar?`<img src="${data.avatar}">`:"♙";}
+function renderDashboard(){document.getElementById("dashCharacterTitle").textContent=t("character");document.getElementById("dashNotesTitle").textContent=t("quickNotes");let filled=fields.filter(x=>String(data[x]||"").trim()).length;document.getElementById("stats").innerHTML=[["♙",data.name||t("unnamed"),t("character")],["✦",filled+"/"+fields.length,t("fieldsCompleted")],["⌘",data.relations.length,t("relationshipCount")],["◷",data.timeline.length,t("timelineEvents")]].map(x=>`<div class="card"><div class="stat">${esc(x[0])} ${esc(x[1])}</div><div class="statlabel">${esc(x[2])}</div></div>`).join("");document.getElementById("dashCharacter").innerHTML=data.bio?`<p>${esc(data.bio)}</p>`:`<div class="empty">${t("characterBio")}</div>`;document.getElementById("dashNotes").innerHTML=data.notesText?`<p>${esc(data.notesText.slice(0,500))}${data.notesText.length>500?"…":""}</p>`:`<div class="empty">${t("noNotes")}</div>`;let checks=[["identityLabel",["name","age","gender","bio"]],["appearanceLabel",["height","hair","eyes","style"]],["personalityCheck",["personalityText","strengths","weaknesses"]],["backgroundLabel",["childhood","family","arc"]],["worldLabel",["worldName","worldConcept","worldRules"]],["storyLabel",["premise","conflict","theme"]]];document.getElementById("checklist").innerHTML=checks.map(([key,fs])=>{let p=Math.round(fs.filter(f=>data[f]).length/fs.length*100);return `<div class="row"><span>${esc(t(key))}</span><span style="width:45%;display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${p}%"></i></div><small>${p}%</small></span></div>`}).join("");}
+function renderTraits(){let names={Warmth:"traitWarmth",Confidence:"traitConfidence",Patience:"traitPatience",Humor:"traitHumor",Curiosity:"traitCuriosity",Discipline:"traitDiscipline",Empathy:"traitEmpathy",Impulsiveness:"traitImpulsiveness"};document.getElementById("traitSliders").innerHTML=traits.map(k=>`<div class="field"><label>${t(names[k])}</label><div class="range"><input type="range" min="0" max="100" value="${data.traits[k]??50}" oninput="data.traits['${k}']=+this.value;this.nextElementSibling.value=this.value;save()"><output>${data.traits[k]??50}</output></div></div>`).join("");}
+function renderRelations(){document.getElementById("relList").innerHTML=data.relations.length?data.relations.map((r,i)=>`<div class="row"><div><b>${esc(r.name)}</b><br><small class="muted">${esc(r.type)}${r.desc?" · "+esc(r.desc):""}</small></div><button class="btn small danger" onclick="removeRel(${i})">×</button></div>`).join(""):`<div class="empty">${t("noRelationships")}</div>`;let map=document.getElementById("relMap");map.innerHTML="";let all=[{name:data.name||t("mainOC"),type:t("you")},...data.relations];all.forEach((r,i)=>{let n=document.createElement("div");n.className="node";n.style.left=(i%3)*31+3+"%";n.style.top=Math.floor(i/3)*90+20+"px";n.innerHTML=`<strong>${esc(r.name)}</strong><small>${esc(r.type||"")}</small>`;map.appendChild(n)});}
+function renderTimeline(){document.getElementById("timelineList").innerHTML=data.timeline.length?data.timeline.map((e,i)=>`<div class="event"><b>${esc(e.date)} — ${esc(e.title)}</b><p>${esc(e.desc)}</p><button class="btn small danger" onclick="removeEvent(${i})">${t("delete")}</button></div>`).join(""):`<div class="empty">${t("noEvents")}</div>`;}
+function renderGallery(){document.getElementById("galleryGrid").innerHTML=data.gallery.length?data.gallery.map((src,i)=>`<div class="photo"><img src="${src}"><button class="btn small danger del" onclick="removeGallery(${i})">×</button></div>`).join(""):`<div class="empty" style="grid-column:1/-1">${t("noImages")}</div>`;}
+function renderOCList(){let box=document.getElementById("ocListGrid");if(!box)return;if(!store.ocs.length){box.innerHTML=`<div class="empty">${t("noOCs")}</div>`;return}box.innerHTML=store.ocs.map(o=>{let is=o.id===data.id;let name=o.name||o.projectName||t("unnamed");let meta=[o.age&&((currentLang==="vi"?"Tuổi ":"Age ")+o.age),o.gender,o.occupation].filter(Boolean).join(" · ");return `<div class="ocItem" onclick="openOC('${o.id}')" title="${esc(t("openOC"))}"><div class="ocInfo"><div class="ocAvatar">${o.avatar?`<img src="${o.avatar}">`:"♙"}</div><div style="min-width:0"><div class="ocName">${esc(name)} ${is?`<span class="currentBadge">${t("current")}</span>`:""}</div><div class="ocMeta">${esc(meta||t("createIdentity"))}</div></div></div><div class="ocActions">${is?`<button class="btn small" onclick="event.stopPropagation();go('dashboard')">${t("openOC")}</button>`:`<button class="btn small" onclick="event.stopPropagation();openOC('${o.id}')">${t("openOC")}</button>`}<button class="btn small danger" onclick="event.stopPropagation();deleteOC('${o.id}')">${t("deleteOC")}</button></div></div>`}).join("");}
+function setAvatar(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{data.avatar=r.result;save();renderProfile();renderOCList();toast(t("avatarSaved"))};r.readAsDataURL(f)}
+function addGallery(ev){[...ev.target.files].forEach(f=>{let r=new FileReader();r.onload=()=>{data.gallery.push(r.result);save();renderGallery()};r.readAsDataURL(f)});ev.target.value=""}
+function removeGallery(i){data.gallery.splice(i,1);save();renderGallery()}
+function addRelationship(){document.getElementById("relModal").classList.add("open");document.getElementById("relName").value="";document.getElementById("relType").value="";document.getElementById("relDesc").value=""}
+function saveRelationship(){let n=document.getElementById("relName").value.trim();if(!n)return;data.relations.push({name:n,type:document.getElementById("relType").value,desc:document.getElementById("relDesc").value});save();renderRelations();renderDashboard();closeModal();toast(t("relationshipAdded"))}
+function removeRel(i){data.relations.splice(i,1);save();renderRelations();renderDashboard()}
+function addTimeline(){document.getElementById("eventModal").classList.add("open");["eventDate","eventTitle","eventDesc"].forEach(x=>document.getElementById(x).value="")}
+function saveTimeline(){let title=document.getElementById("eventTitle").value.trim();if(!title)return;data.timeline.push({date:document.getElementById("eventDate").value,title,desc:document.getElementById("eventDesc").value});data.timeline.sort((a,b)=>String(a.date).localeCompare(String(b.date)));save();renderTimeline();renderDashboard();closeModal();toast(t("eventAdded"))}
+function removeEvent(i){data.timeline.splice(i,1);save();renderTimeline();renderDashboard()}
+function closeModal(){document.querySelectorAll(".modal").forEach(x=>x.classList.remove("open"))}
+function saveCurrentOC(){save();renderOCList();toast(t("saved"))}
+function newOC(){if(!confirm(t("newOCConfirm")))return;save();let count=store.ocs.length+1;let o=blankOC(t("newOCName")+" "+count);store.ocs.push(o);data=o;store.currentId=o.id;persistStore();hydrate();go("profile")}
+function openOC(id){save();let found=store.ocs.find(o=>o.id===id);if(!found)return;data=found;store.currentId=id;persistStore();hydrate();go("dashboard")}
+function deleteOC(id){if(!confirm(t("deleteOCConfirm")))return;let index=store.ocs.findIndex(o=>o.id===id);if(index<0)return;store.ocs.splice(index,1);if(!store.ocs.length){let o=blankOC(t("defaultOCName"));store.ocs.push(o)}if(id===data.id){data=store.ocs[Math.min(index,store.ocs.length-1)];store.currentId=data.id}persistStore();hydrate();go("ocList")}
+function resetData(){if(!confirm(t("resetConfirm")))return;localStorage.removeItem(KEY);localStorage.removeItem(OC_KEY);location.reload()}
+function go(page){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));let target=document.getElementById(page);if(!target)return;target.classList.add("active");let nav=document.getElementById("ocNav");if(nav)nav.style.display=page==="ocList"?"none":"grid";let section=document.querySelector(".navSection");if(section)section.style.display=page==="ocList"?"none":"block";document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===page));let span=document.querySelector(`[data-page="${page}"] span`);document.getElementById("pageTitle").textContent=span?span.textContent:t("ocList");if(page==="ocList")renderOCList();}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.page));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)closeModal()}));
+document.getElementById("languageSelect").value=currentLang;
+hydrate();go("ocList");
+</script>
+</body>
+</html>
